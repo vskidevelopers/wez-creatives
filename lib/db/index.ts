@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle, NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
 const connectionString = process.env.DATABASE_URL;
@@ -23,4 +23,6 @@ if (process.env.NODE_ENV !== "production") {
   globalForDb.sql = sql;
 }
 
-export const db: ReturnType<typeof drizzle> = drizzle({ client: sql, schema });
+// Explicitly type the database instance with the schema
+// This enables db.query.* relational API with full type inference
+export const db: NeonHttpDatabase<typeof schema> = drizzle(sql, { schema });
