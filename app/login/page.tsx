@@ -19,6 +19,7 @@ export default function AdminLoginPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
+        console.log("Attempting login with:", { email, password });
 
         const { error } = await authClient.signIn.email({
             email,
@@ -27,6 +28,7 @@ export default function AdminLoginPage() {
 
         if (error) {
             setError(error.message || "Invalid email or password");
+            console.log("Login error:", error);
             setLoading(false);
         } else {
             router.push("/admin");
