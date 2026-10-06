@@ -29,13 +29,13 @@ export function MobileNav() {
                         <Link href="/" onClick={closeMenu} className="text-sm font-medium py-2">
                             Home
                         </Link>
-                        <Link href="/services" onClick={closeMenu} className="text-sm font-medium py-2">
+                        <Link href="/#what-we-do" onClick={closeMenu} className="text-sm font-medium py-2">
                             Services
                         </Link>
-                        <Link href="/work" onClick={closeMenu} className="text-sm font-medium py-2">
+                        <Link href="/#featured-work" onClick={closeMenu} className="text-sm font-medium py-2">
                             Work
                         </Link>
-                        <Link href="/shop" onClick={closeMenu} className="text-sm font-medium py-2">
+                        <Link href="/#shop-preview" onClick={closeMenu} className="text-sm font-medium py-2">
                             Shop
                         </Link>
                         <Link href="/about" onClick={closeMenu} className="text-sm font-medium py-2">
@@ -50,7 +50,7 @@ export function MobileNav() {
                                     Track Order
                                 </Button>
                             </Link>
-                            <Link href="/custom-request" onClick={closeMenu}>
+                            <Link href="/#custom-work" onClick={closeMenu}>
                                 <Button size="sm" className="w-full">
                                     Request a Quote
                                 </Button>

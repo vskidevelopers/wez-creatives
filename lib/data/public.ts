@@ -3,6 +3,8 @@ import {
   products,
   productMedia,
   media,
+  productVariants,
+  productCategories,
   services,
   serviceMedia,
   portfolioWork,
@@ -44,7 +46,84 @@ export async function getPublicProducts(limit: number = 8) {
     return publishedProducts;
   } catch (error) {
     console.error("Error fetching public products:", error);
-    return []; // Return empty array on error
+    return [];
+  }
+}
+
+/**
+ * Fetch a single published product by slug with all its media and variants.
+ * Returns null if the product does not exist or is not published.
+ */
+export async function getPublicProductBySlug(slug: string) {
+  try {
+    // 1. Fetch the product with its category
+    const [product] = await db
+      .select({
+        id: products.id,
+        name: products.name,
+        slug: products.slug,
+        shortDescription: products.shortDescription,
+        fullDescription: products.fullDescription,
+        price: products.price,
+        isPublished: products.isPublished,
+        isFeatured: products.isFeatured,
+        categoryId: products.categoryId,
+        categoryName: productCategories.name,
+      })
+      .from(products)
+      .leftJoin(
+        productCategories,
+        eq(products.categoryId, productCategories.id),
+      )
+      .where(and(eq(products.slug, slug), eq(products.isPublished, true)))
+      .limit(1);
+
+    if (!product) {
+      return null;
+    }
+
+    // 2. Fetch all media for this product, ordered by sort order
+    const productMediaList = await db
+      .select({
+        id: media.id,
+        secureUrl: media.secureUrl,
+        format: media.format,
+        width: media.width,
+        height: media.height,
+        isPrimary: productMedia.isPrimary,
+        sortOrder: productMedia.sortOrder,
+      })
+      .from(productMedia)
+      .innerJoin(media, eq(productMedia.mediaId, media.id))
+      .where(eq(productMedia.productId, product.id))
+      .orderBy(asc(productMedia.sortOrder));
+
+    // 3. Fetch all active variants for this product
+    const variants = await db
+      .select({
+        id: productVariants.id,
+        name: productVariants.name,
+        size: productVariants.size,
+        color: productVariants.color,
+        priceOverride: productVariants.priceOverride,
+      })
+      .from(productVariants)
+      .where(
+        and(
+          eq(productVariants.productId, product.id),
+          eq(productVariants.isActive, true),
+        ),
+      )
+      .orderBy(asc(productVariants.createdAt));
+
+    return {
+      ...product,
+      media: productMediaList,
+      variants,
+    };
+  } catch (error) {
+    console.error("Error fetching public product by slug:", error);
+    return null;
   }
 }
 
@@ -78,7 +157,7 @@ export async function getPublicServices(limit: number = 6) {
     return publishedServices;
   } catch (error) {
     console.error("Error fetching public services:", error);
-    return []; // Return empty array on error
+    return [];
   }
 }
 
@@ -118,6 +197,6 @@ export async function getPublicPortfolioWork(limit: number = 6) {
     return publishedWork;
   } catch (error) {
     console.error("Error fetching public portfolio work:", error);
-    return []; // Return empty array on error
+    return [];
   }
 }

@@ -17,13 +17,13 @@ export function Hero() {
                         From custom designs to bulk production, we bring your vision to life.
                     </p>
                     <div className="flex flex-wrap gap-4">
-                        <Link href="/services">
+                        <Link href="/#what-we-do">
                             <Button size="lg">Explore Services</Button>
                         </Link>
-                        <Link href="/work">
+                        <Link href="/#featured-work">
                             <Button size="lg" variant="outline">View Our Work</Button>
                         </Link>
-                        <Link href="/shop">
+                        <Link href="/#shop-preview">
                             <Button size="lg" variant="outline">Shop</Button>
                         </Link>
                     </div>

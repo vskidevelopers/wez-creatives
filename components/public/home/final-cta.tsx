@@ -11,17 +11,17 @@ export function FinalCTA() {
                         Let&apos;s bring your creative vision to life. Explore our services, view our work, or get in touch to discuss your needs.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
-                        <Link href="/services">
+                        <Link href="/#what-we-do">
                             <Button size="lg" variant="secondary">
                                 Explore Services
                             </Button>
                         </Link>
-                        <Link href="/work">
+                        <Link href="/#featured-work">
                             <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                                 View Our Work
                             </Button>
                         </Link>
-                        <Link href="/custom-request">
+                        <Link href="/#custom-work">
                             <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                                 Request a Quote
                             </Button>

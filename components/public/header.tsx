@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MobileNav } from "./mobile-nav";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config/site";
+import { CartIcon } from "./cart-icon";
 
 export function Header() {
     return (
@@ -19,13 +20,13 @@ export function Header() {
                     <Link href="/" className="transition-colors hover:text-foreground/80">
                         Home
                     </Link>
-                    <Link href="/services" className="transition-colors hover:text-foreground/80">
+                    <Link href="/#what-we-do" className="transition-colors hover:text-foreground/80">
                         Services
                     </Link>
-                    <Link href="/work" className="transition-colors hover:text-foreground/80">
+                    <Link href="/#featured-work" className="transition-colors hover:text-foreground/80">
                         Work
                     </Link>
-                    <Link href="/shop" className="transition-colors hover:text-foreground/80">
+                    <Link href="/#shop-preview" className="transition-colors hover:text-foreground/80">
                         Shop
                     </Link>
                     <Link href="/about" className="transition-colors hover:text-foreground/80">
@@ -35,9 +36,9 @@ export function Header() {
                         Contact
                     </Link>
                 </nav>
-
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center space-x-4">
+                    <CartIcon />
                     <Link href="/track-order">
                         <Button variant="ghost" size="sm">
                             Track Order

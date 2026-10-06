@@ -20,13 +20,13 @@ export function Footer() {
                     <div className="space-y-4">
                         <h4 className="text-sm font-semibold">Explore</h4>
                         <nav className="flex flex-col space-y-2 text-sm">
-                            <Link href="/services" className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Link href="/#what-we-do" className="text-muted-foreground hover:text-foreground transition-colors">
                                 Services
                             </Link>
-                            <Link href="/work" className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Link href="/#featured-work" className="text-muted-foreground hover:text-foreground transition-colors">
                                 Work
                             </Link>
-                            <Link href="/shop" className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Link href="/#shop-preview" className="text-muted-foreground hover:text-foreground transition-colors">
                                 Shop
                             </Link>
                             <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -39,7 +39,7 @@ export function Footer() {
                     <div className="space-y-4">
                         <h4 className="text-sm font-semibold">Actions</h4>
                         <nav className="flex flex-col space-y-2 text-sm">
-                            <Link href="/custom-request" className="text-muted-foreground hover:text-foreground transition-colors">
+                            <Link href="/#custom-work" className="text-muted-foreground hover:text-foreground transition-colors">
                                 Request a Quote
                             </Link>
                             <Link href="/track-order" className="text-muted-foreground hover:text-foreground transition-colors">
