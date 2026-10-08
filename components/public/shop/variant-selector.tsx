@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { formatKES } from "./product-card"; // Import the function directly here
 
 type Variant = {
     id: string;
@@ -14,19 +15,16 @@ type Variant = {
 type VariantSelectorProps = {
     variants: Variant[];
     basePrice: number;
-    formatPrice: (amount: number) => string;
 };
 
 /**
  * Interactive variant selector.
  * Displays available options and updates the displayed price when a variant
- * with a price override is selected. This is presentation only — it does not
- * create an order, add to cart, or imply a purchase.
+ * with a price override is selected.
  */
 export function VariantSelector({
     variants,
     basePrice,
-    formatPrice,
 }: VariantSelectorProps) {
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -37,7 +35,6 @@ export function VariantSelector({
 
     const displayedPrice = selectedVariant?.priceOverride ?? basePrice;
 
-    // Group variants by size and color for cleaner presentation when both exist
     const hasSize = variants.some((v) => v.size);
     const hasColor = variants.some((v) => v.color);
 
@@ -46,7 +43,7 @@ export function VariantSelector({
             <div className="space-y-3">
                 <div className="flex items-baseline justify-between">
                     <span className="text-sm font-medium text-muted-foreground">Price</span>
-                    <span className="text-2xl font-bold">{formatPrice(basePrice)}</span>
+                    <span className="text-2xl font-bold">{formatKES(basePrice)}</span>
                 </div>
             </div>
         );
@@ -57,7 +54,7 @@ export function VariantSelector({
             {/* Price Display */}
             <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium text-muted-foreground">Price</span>
-                <span className="text-2xl font-bold">{formatPrice(displayedPrice)}</span>
+                <span className="text-2xl font-bold">{formatKES(displayedPrice)}</span>
             </div>
 
             {/* Size Options */}
@@ -68,9 +65,7 @@ export function VariantSelector({
                         {Array.from(new Set(variants.map((v) => v.size).filter(Boolean))).map(
                             (size) => {
                                 const matchingVariants = variants.filter((v) => v.size === size);
-                                const isSelected = matchingVariants.some(
-                                    (v) => v.id === selectedId
-                                );
+                                const isSelected = matchingVariants.some((v) => v.id === selectedId);
                                 const isAvailable = matchingVariants.length > 0;
 
                                 return (
@@ -79,7 +74,6 @@ export function VariantSelector({
                                         type="button"
                                         disabled={!isAvailable}
                                         onClick={() => {
-                                            // Select the first matching variant for this size
                                             const target = matchingVariants[0];
                                             if (target) setSelectedId(target.id);
                                         }}
@@ -109,9 +103,7 @@ export function VariantSelector({
                         {Array.from(new Set(variants.map((v) => v.color).filter(Boolean))).map(
                             (color) => {
                                 const matchingVariants = variants.filter((v) => v.color === color);
-                                const isSelected = matchingVariants.some(
-                                    (v) => v.id === selectedId
-                                );
+                                const isSelected = matchingVariants.some((v) => v.id === selectedId);
                                 const isAvailable = matchingVariants.length > 0;
 
                                 return (

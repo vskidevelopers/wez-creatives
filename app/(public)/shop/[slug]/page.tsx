@@ -12,11 +12,11 @@ import { formatKES } from "@/components/public/shop/product-card";
 import { ProductAddToCart } from "@/components/public/shop/product-add-to-cart";
 
 type PageProps = {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const product = await getPublicProductBySlug(params.slug);
+    const product = await getPublicProductBySlug((await params).slug);
 
     if (!product) {
         return {
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
-    const product = await getPublicProductBySlug(params.slug);
+    const product = await getPublicProductBySlug((await params).slug);
 
     if (!product) {
         notFound();
@@ -102,7 +102,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                                 priceOverride: v.priceOverride,
                             }))}
                             basePrice={product.price}
-                            formatPrice={formatKES}
+
                         />
 
                         <div className="border-t" />

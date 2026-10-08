@@ -5,6 +5,7 @@ import { ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatKES } from "./product-card";
+import { WhatsAppButton } from "@/components/public/whatsapp-button";
 
 type Variant = {
     id: string;
@@ -57,6 +58,11 @@ export function ProductAddToCart({
         setTimeout(() => setAdded(false), 2000);
     };
 
+    // Generate WhatsApp message based on current selection
+    const whatsappMessage = `Hi Wez Creatives, I'm interested in:
+Product: ${productName}${selectedVariant ? `\nVariant: ${selectedVariant.name}` : ""}
+I'd like to get more information.`;
+
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -100,6 +106,15 @@ export function ProductAddToCart({
                     </>
                 )}
             </Button>
+
+            <WhatsAppButton
+                phone={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""}
+                message={whatsappMessage}
+                label="Inquire on WhatsApp"
+                variant="outline"
+                size="lg"
+                className="w-full"
+            />
 
             {hasVariants && !selectedVariantId && (
                 <p className="text-sm text-muted-foreground text-center">

@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminHeader } from "@/components/admin/admin-header";
 
 /**
  * Protected Admin Layout.
@@ -19,5 +21,20 @@ export default async function AdminLayout({
         redirect("/login");
     }
 
-    return <div className="min-h-screen bg-background">{children}</div>;
+    return (
+        <div className="flex min-h-screen bg-background">
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block">
+                <AdminSidebar />
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col min-w-0">
+                <AdminHeader userEmail={session.user.email || "Admin"} />
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
 }

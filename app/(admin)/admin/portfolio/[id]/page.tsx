@@ -7,10 +7,12 @@ import { PortfolioForm } from "@/components/admin/portfolio-form";
 export default async function EditPortfolioWorkPage({
     params
 }: {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }) {
+
+    const { id } = await params;
     const work = await db.query.portfolioWork.findFirst({
-        where: eq(portfolioWork.id, params.id),
+        where: eq(portfolioWork.id, id),
     });
 
     if (!work) {
@@ -26,7 +28,7 @@ export default async function EditPortfolioWorkPage({
     })
         .from(portfolioWorkMedia)
         .innerJoin(media, eq(portfolioWorkMedia.mediaId, media.id))
-        .where(eq(portfolioWorkMedia.workId, params.id));
+        .where(eq(portfolioWorkMedia.workId, id));
 
     return (
         <div className="p-8 space-y-6">

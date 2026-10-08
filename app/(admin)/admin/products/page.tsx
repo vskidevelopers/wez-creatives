@@ -15,6 +15,9 @@ export default async function ProductsPage() {
         isPublished: products.isPublished,
         categoryName: productCategories.name,
     }).from(products).leftJoin(productCategories, eq(products.categoryId, productCategories.id));
+    const everyItem = await db.select().from(products).leftJoin(productCategories, eq(products.categoryId, productCategories.id));
+
+    console.log("Fetched all items:", everyItem);
 
     return (
         <div className="p-8 space-y-6">
