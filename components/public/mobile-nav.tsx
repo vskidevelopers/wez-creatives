@@ -35,17 +35,24 @@ export function MobileNav() {
                         <Link href="/#featured-work" onClick={closeMenu} className="text-sm font-medium py-2">
                             Work
                         </Link>
-
-                        <Link href="/work" onClick={closeMenu} className="text-sm font-medium py-2">
-                            Work
+                        <Link href="/#shop-preview" onClick={closeMenu} className="text-sm font-medium py-2">
+                            Shop
                         </Link>
-                        <Link href="/custom-request" onClick={closeMenu} className="text-sm font-medium py-2">
-                            Custom Request
+                        <Link href="/about" onClick={closeMenu} className="text-sm font-medium py-2">
+                            About
+                        </Link>
+                        <Link href="/contact" onClick={closeMenu} className="text-sm font-medium py-2">
+                            Contact
                         </Link>
                         <div className="border-t pt-4 space-y-2">
                             <Link href="/track-order" onClick={closeMenu}>
                                 <Button variant="outline" size="sm" className="w-full">
                                     Track Order
+                                </Button>
+                            </Link>
+                            <Link href="/#custom-work" onClick={closeMenu}>
+                                <Button size="sm" className="w-full">
+                                    Request a Quote
                                 </Button>
                             </Link>
                         </div>

@@ -9,7 +9,6 @@ import {
     Briefcase,
     Image as ImageIcon,
     ShoppingCart,
-    FolderTree
 } from "lucide-react";
 
 const navItems = [
@@ -24,8 +23,8 @@ export function AdminSidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="flex flex-col w-64 border-r bg-card h-full">
-            <div className="p-6 border-b">
+        <aside className="flex flex-col w-64 border-r bg-background sticky top-0 h-screen overflow-y-auto">
+            <div className="p-6 border-b bg-background">
                 <h2 className="text-xl font-bold tracking-tight">Wez Admin</h2>
             </div>
             <nav className="flex-1 p-4 space-y-1">
