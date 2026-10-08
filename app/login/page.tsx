@@ -21,19 +21,29 @@ export default function AdminLoginPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
-        console.log("Attempting login with:", { email, password });
 
-        const { error } = await authClient.signIn.email({
-            email,
-            password,
-        });
+        console.log("🔐 Attempting login with:", { email });
+        console.log("🌐 Auth client baseURL:", process.env.NEXT_PUBLIC_APP_URL);
 
-        if (error) {
-            setError(error.message || "Invalid email or password");
-            console.log("Login error:", error);
+        try {
+            const { data, error } = await authClient.signIn.email({
+                email,
+                password,
+            });
+
+            if (error) {
+                console.error("❌ Login error:", error);
+                setError(error.message || "Invalid email or password");
+                setLoading(false);
+            } else {
+                console.log("✅ Login successful:", data);
+                router.push("/admin");
+                router.refresh();
+            }
+        } catch (err) {
+            console.error("❌ Unexpected error:", err);
+            setError("An unexpected error occurred");
             setLoading(false);
-        } else {
-            router.push("/admin");
         }
     };
 
