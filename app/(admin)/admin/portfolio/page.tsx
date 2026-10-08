@@ -18,6 +18,8 @@ export default async function PortfolioPage() {
     }).from(portfolioWork).leftJoin(portfolioCategories, eq(portfolioWork.categoryId, portfolioCategories.id))
         .orderBy(portfolioWork.sortOrder, portfolioWork.createdAt);
 
+    console.log("Fetched all portfolio work:", allWork);
+
     return (
         <div className="p-8 space-y-6">
             <div className="flex justify-between items-center">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/config/site";
+import { WhatsAppButton } from "./whatsapp-button";
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
@@ -48,6 +49,9 @@ export function Footer() {
                             <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
                                 Contact
                             </Link>
+                            <Link href="/work" className="text-muted-foreground hover:text-foreground transition-colors">
+                                Work
+                            </Link>
                         </nav>
                     </div>
 
@@ -57,9 +61,19 @@ export function Footer() {
                         <p className="text-sm text-muted-foreground">
                             Ready to start your project? Contact us to discuss your creative needs.
                         </p>
-                        <Link href="/contact" className="text-sm text-foreground hover:underline">
-                            Contact Us →
-                        </Link>
+                        <div className="flex flex-col gap-2">
+                            <Link href="/contact" className="text-sm text-foreground hover:underline">
+                                Contact Us →
+                            </Link>
+                            <WhatsAppButton
+                                phone={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""}
+                                message="Hi Wez Creatives, I'd like to make an inquiry about your services."
+                                label="Chat on WhatsApp"
+                                variant="outline"
+                                size="sm"
+                                className="w-fit"
+                            />
+                        </div>
                     </div>
                 </div>
 

@@ -13,12 +13,9 @@ import {
 } from "@/lib/db/schema";
 import { eq, and, desc, asc } from "drizzle-orm";
 
-/**
- * Fetch published products with their primary media for public display.
- * Returns featured products first, then others, limited for homepage preview.
- */
 export async function getPublicProducts(limit: number = 8) {
   try {
+    // 1. First, try to get products with their primary media
     const publishedProducts = await db
       .select({
         id: products.id,
@@ -43,20 +40,40 @@ export async function getPublicProducts(limit: number = 8) {
       .orderBy(desc(products.isFeatured), asc(products.createdAt))
       .limit(limit);
 
-    return publishedProducts;
+    // 2. Safety net: If a product has no primary image, fetch its first available image
+    const productsWithMedia = await Promise.all(
+      publishedProducts.map(async (product) => {
+        if (product.mediaUrl) return product; // Already has a primary image
+
+        // Fallback: get any media for this product
+        const fallbackMedia = await db
+          .select({ mediaId: media.id, mediaUrl: media.secureUrl })
+          .from(productMedia)
+          .innerJoin(media, eq(productMedia.mediaId, media.id))
+          .where(eq(productMedia.productId, product.id))
+          .orderBy(asc(productMedia.sortOrder))
+          .limit(1);
+
+        if (fallbackMedia.length > 0) {
+          return {
+            ...product,
+            mediaId: fallbackMedia[0].mediaId,
+            mediaUrl: fallbackMedia[0].mediaUrl,
+          };
+        }
+        return product;
+      }),
+    );
+
+    return productsWithMedia;
   } catch (error) {
     console.error("Error fetching public products:", error);
     return [];
   }
 }
 
-/**
- * Fetch a single published product by slug with all its media and variants.
- * Returns null if the product does not exist or is not published.
- */
 export async function getPublicProductBySlug(slug: string) {
   try {
-    // 1. Fetch the product with its category
     const [product] = await db
       .select({
         id: products.id,
@@ -82,7 +99,6 @@ export async function getPublicProductBySlug(slug: string) {
       return null;
     }
 
-    // 2. Fetch all media for this product, ordered by sort order
     const productMediaList = await db
       .select({
         id: media.id,
@@ -98,7 +114,6 @@ export async function getPublicProductBySlug(slug: string) {
       .where(eq(productMedia.productId, product.id))
       .orderBy(asc(productMedia.sortOrder));
 
-    // 3. Fetch all active variants for this product
     const variants = await db
       .select({
         id: productVariants.id,
@@ -127,9 +142,6 @@ export async function getPublicProductBySlug(slug: string) {
   }
 }
 
-/**
- * Fetch published services with their primary media for public display.
- */
 export async function getPublicServices(limit: number = 6) {
   try {
     const publishedServices = await db
@@ -161,9 +173,6 @@ export async function getPublicServices(limit: number = 6) {
   }
 }
 
-/**
- * Fetch published portfolio work with primary media for public display.
- */
 export async function getPublicPortfolioWork(limit: number = 6) {
   try {
     const publishedWork = await db

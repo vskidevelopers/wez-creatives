@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -9,38 +10,53 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-type WorkData = {
-    id?: string;
-    title: string;
-    slug: string;
-    description?: string | null;
-    categoryId?: string | null;
-    clientEventReference?: string | null;
-    projectContext?: string | null;
-    projectDate?: string | null;
-    isPublished: boolean;
-    sortOrder: number;
-};
+type PortfolioData = any;
+type CategoryData = any;
+type MediaData = any;
 
-type MediaData = {
-    id: string;
-    secureUrl: string;
-    isPrimary: boolean;
-};
+/**
+ * Convert a string to a URL-friendly slug
+ */
+function toSlug(text: string): string {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
 
 export function PortfolioForm({
     initialData,
     categories,
     existingMedia
 }: {
-    initialData?: WorkData;
-    categories: { id: string; name: string }[];
+    initialData?: PortfolioData;
+    categories: CategoryData[];
     existingMedia: MediaData[];
 }) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mediaList, setMediaList] = useState(existingMedia || []);
     const [uploading, setUploading] = useState(false);
+
+    // State for auto-slug generation
+    const [title, setTitle] = useState(initialData?.title || "");
+    const [slug, setSlug] = useState(initialData?.slug || "");
+    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+    const handleTitleChange = (value: string) => {
+        setTitle(value);
+        if (!initialData && !slugManuallyEdited) {
+            setSlug(toSlug(value));
+        }
+    };
+
+    const handleSlugChange = (value: string) => {
+        setSlug(value);
+        setSlugManuallyEdited(true);
+    };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || !initialData?.id) return;
@@ -66,15 +82,32 @@ export function PortfolioForm({
             <input type="hidden" name="id" value={initialData?.id || ""} />
 
             <Card>
-                <CardHeader><CardTitle>Project Information</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-sm font-medium">Title</label>
-                        <Input name="title" defaultValue={initialData?.title} required />
+                        <Input
+                            name="title"
+                            value={title}
+                            onChange={(e) => handleTitleChange(e.target.value)}
+                            required
+                            placeholder="e.g., Nairobi Tech Summit 2026"
+                        />
                     </div>
                     <div>
-                        <label className="text-sm font-medium">Slug</label>
-                        <Input name="slug" defaultValue={initialData?.slug} required />
+                        <label className="text-sm font-medium">
+                            Slug
+                            <span className="ml-2 text-xs text-muted-foreground font-normal">
+                                {!initialData && !slugManuallyEdited ? "(auto-generated)" : ""}
+                            </span>
+                        </label>
+                        <Input
+                            name="slug"
+                            value={slug}
+                            onChange={(e) => handleSlugChange(e.target.value)}
+                            required
+                            placeholder="e.g., nairobi-tech-summit-2026"
+                        />
                     </div>
                     <div>
                         <label className="text-sm font-medium">Category</label>
@@ -84,24 +117,24 @@ export function PortfolioForm({
                         </select>
                     </div>
                     <div>
-                        <label className="text-sm font-medium">Display Order</label>
-                        <Input name="sortOrder" type="number" defaultValue={initialData?.sortOrder || 0} />
-                    </div>
-                    <div>
                         <label className="text-sm font-medium">Client / Event Reference</label>
-                        <Input name="clientEventReference" defaultValue={initialData?.clientEventReference || ""} placeholder="e.g., XYZ Ltd, Nairobi Expo" />
+                        <Input name="clientEventReference" defaultValue={initialData?.clientEventReference} placeholder="e.g., Nairobi Tech Summit" />
                     </div>
                     <div>
                         <label className="text-sm font-medium">Project Date</label>
-                        <Input name="projectDate" type="date" defaultValue={initialData?.projectDate || ""} />
+                        <Input name="projectDate" type="date" defaultValue={initialData?.projectDate} />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium">Display Order</label>
+                        <Input name="sortOrder" type="number" defaultValue={initialData?.sortOrder || 0} />
                     </div>
                     <div className="col-span-2">
                         <label className="text-sm font-medium">Description</label>
-                        <textarea name="description" defaultValue={initialData?.description || ""} className="w-full p-2 rounded-md border bg-background min-h-[100px]" />
+                        <textarea name="description" defaultValue={initialData?.description} className="w-full p-2 rounded-md border bg-background min-h-[100px]" placeholder="Brief overview of the project" />
                     </div>
                     <div className="col-span-2">
                         <label className="text-sm font-medium">Project Context</label>
-                        <textarea name="projectContext" defaultValue={initialData?.projectContext || ""} className="w-full p-2 rounded-md border bg-background min-h-[100px]" placeholder="Additional context, challenges, solutions, etc." />
+                        <textarea name="projectContext" defaultValue={initialData?.projectContext} className="w-full p-2 rounded-md border bg-background min-h-[100px]" placeholder="Detailed context, challenges, solutions, etc." />
                     </div>
                     <div className="flex items-center gap-4">
                         <label className="flex items-center gap-2">
@@ -117,25 +150,35 @@ export function PortfolioForm({
                     <CardHeader><CardTitle>Project Images</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex gap-4 flex-wrap">
-                            {mediaList.map((m) => (
+                            {mediaList.map((m: any) => (
                                 <div key={m.id} className="relative group">
-                                    <img src={m.secureUrl} className="w-24 h-24 object-cover rounded-md border" />
+                                    <img src={m.secureUrl} alt={m.originalFilename || "Portfolio image"} className="w-24 h-24 object-cover rounded-md border" />
                                     {m.isPrimary && <Badge className="absolute top-1 left-1">Primary</Badge>}
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 rounded-md">
                                         {!m.isPrimary && (
-                                            <form action={async () => {
-                                                await setPrimaryPortfolioMediaAction(initialData.id!, m.id);
-                                                setMediaList(mediaList.map(x => ({ ...x, isPrimary: x.id === m.id })));
-                                            }}>
-                                                <Button type="button" size="sm" variant="secondary">Set Primary</Button>
-                                            </form>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="secondary"
+                                                onClick={async () => {
+                                                    await setPrimaryPortfolioMediaAction(initialData.id, m.id);
+                                                    setMediaList(mediaList.map(x => ({ ...x, isPrimary: x.id === m.id })));
+                                                }}
+                                            >
+                                                Set Primary
+                                            </Button>
                                         )}
-                                        <form action={async () => {
-                                            await detachMediaFromPortfolioWorkAction(initialData.id!, m.id);
-                                            setMediaList(mediaList.filter(x => x.id !== m.id));
-                                        }}>
-                                            <Button type="button" size="sm" variant="destructive">Remove</Button>
-                                        </form>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={async () => {
+                                                await detachMediaFromPortfolioWorkAction(initialData.id, m.id);
+                                                setMediaList(mediaList.filter(x => x.id !== m.id));
+                                            }}
+                                        >
+                                            Remove
+                                        </Button>
                                     </div>
                                 </div>
                             ))}
@@ -150,7 +193,7 @@ export function PortfolioForm({
             )}
 
             <div className="flex gap-4">
-                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save Work"}</Button>
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save Portfolio Item"}</Button>
                 <Button type="button" variant="outline" onClick={() => router.push("/admin/portfolio")}>Cancel</Button>
             </div>
         </form>

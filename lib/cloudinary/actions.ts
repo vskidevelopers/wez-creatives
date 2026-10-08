@@ -13,6 +13,14 @@ import { eq } from "drizzle-orm";
  * Protected: Requires an active admin session.
  */
 export async function uploadMediaAction(file: File, folder: string) {
+  // FORCE CONFIGURATION HERE to bypass Next.js module caching quirks with Server Actions
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true,
+  });
+
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     throw new Error(
@@ -61,6 +69,14 @@ export async function uploadMediaAction(file: File, folder: string) {
  * Protected: Requires an active admin session.
  */
 export async function deleteMediaAction(mediaId: string) {
+  // FORCE CONFIGURATION HERE as well for consistency
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true,
+  });
+
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     throw new Error(

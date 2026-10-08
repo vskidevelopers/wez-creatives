@@ -7,11 +7,13 @@ import { ProductForm } from "@/components/admin/product-form";
 export default async function EditProductPage({
     params
 }: {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }) {
+
+    const { id } = await params;
     // 1. Fetch the specific product
     const product = await db.query.products.findFirst({
-        where: eq(products.id, params.id),
+        where: eq(products.id, id),
     });
 
     // If the product doesn't exist, show a 404 page
@@ -24,7 +26,7 @@ export default async function EditProductPage({
 
     // 3. Fetch all variants associated with this product
     const variants = await db.select().from(productVariants).where(
-        eq(productVariants.productId, params.id)
+        eq(productVariants.productId, id)
     );
 
     // 4. Fetch all media associated with this product
@@ -35,7 +37,7 @@ export default async function EditProductPage({
     })
         .from(productMedia)
         .innerJoin(media, eq(productMedia.mediaId, media.id))
-        .where(eq(productMedia.productId, params.id));
+        .where(eq(productMedia.productId, id));
 
     // Combine the product data with its variants for the form component
     const initialData = {

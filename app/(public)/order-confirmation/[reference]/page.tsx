@@ -9,22 +9,22 @@ import { CheckCircle } from "lucide-react";
 import { formatKES } from "@/components/public/shop/product-card";
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/config/site";
+import { WhatsAppButton } from "@/components/public/whatsapp-button";
 
-type PageProps = {
-    params: { reference: string };
-};
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ reference: string }> }): Promise<Metadata> {
+    const { reference } = await params;
     return {
         title: `Order Confirmation | ${siteConfig.name}`,
     };
 }
 
-export default async function OrderConfirmationPage({ params }: PageProps) {
+export default async function OrderConfirmationPage({ params }: { params: Promise<{ reference: string }> }) {
+    const { reference } = await params;
+
     const [order] = await db
         .select()
         .from(orders)
-        .where(eq(orders.reference, params.reference))
+        .where(eq(orders.reference, reference))
         .limit(1);
 
     if (!order) {
@@ -113,17 +113,19 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
                     </CardContent>
                 </Card>
 
-                <div className="flex gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link href="/shop">
                         <Button variant="outline" size="lg">
                             Continue Shopping
                         </Button>
                     </Link>
-                    <Link href="/">
-                        <Button size="lg">
-                            Back to Home
-                        </Button>
-                    </Link>
+                    <WhatsAppButton
+                        phone={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""}
+                        message={`Hi Wez Creatives, I'm following up on my order.\n\nOrder Reference: ${order.reference}\n\nI'd like an update on my order.`}
+                        label="Follow up on WhatsApp"
+                        variant="default"
+                        size="lg"
+                    />
                 </div>
             </div>
         </div>

@@ -14,19 +14,49 @@ type ProductData = any; // Replace with proper type from DB query
 type CategoryData = any;
 type MediaData = any;
 
+/**
+ * Convert a string to a URL-friendly slug
+ */
+function toSlug(text: string): string {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "") // Remove special characters
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/-+/g, "-"); // Replace multiple hyphens with single hyphen
+}
+
 export function ProductForm({
     initialData,
     categories,
     existingMedia
 }: {
-    initialData?: ProductData,
-    categories: CategoryData[],
-    existingMedia: MediaData[]
+    initialData?: ProductData;
+    categories: CategoryData[];
+    existingMedia: MediaData[];
 }) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mediaList, setMediaList] = useState(existingMedia || []);
     const [uploading, setUploading] = useState(false);
+
+    // State for auto-slug generation
+    const [name, setName] = useState(initialData?.name || "");
+    const [slug, setSlug] = useState(initialData?.slug || "");
+    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+    const handleNameChange = (value: string) => {
+        setName(value);
+        // Auto-generate slug only for NEW products and if the user hasn't manually edited the slug
+        if (!initialData && !slugManuallyEdited) {
+            setSlug(toSlug(value));
+        }
+    };
+
+    const handleSlugChange = (value: string) => {
+        setSlug(value);
+        setSlugManuallyEdited(true); // Mark as manually edited so it stops auto-generating
+    };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || !initialData?.id) return;
@@ -56,11 +86,28 @@ export function ProductForm({
                 <CardContent className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="text-sm font-medium">Name</label>
-                        <Input name="name" defaultValue={initialData?.name} required />
+                        <Input
+                            name="name"
+                            value={name}
+                            onChange={(e) => handleNameChange(e.target.value)}
+                            required
+                            placeholder="e.g., Custom Branded T-Shirt"
+                        />
                     </div>
                     <div>
-                        <label className="text-sm font-medium">Slug</label>
-                        <Input name="slug" defaultValue={initialData?.slug} required />
+                        <label className="text-sm font-medium">
+                            Slug
+                            <span className="ml-2 text-xs text-muted-foreground font-normal">
+                                {!initialData && !slugManuallyEdited ? "(auto-generated)" : ""}
+                            </span>
+                        </label>
+                        <Input
+                            name="slug"
+                            value={slug}
+                            onChange={(e) => handleSlugChange(e.target.value)}
+                            required
+                            placeholder="e.g., custom-branded-t-shirt"
+                        />
                     </div>
                     <div>
                         <label className="text-sm font-medium">Price (KES)</label>
@@ -75,11 +122,11 @@ export function ProductForm({
                     </div>
                     <div className="col-span-2">
                         <label className="text-sm font-medium">Short Description</label>
-                        <Input name="shortDescription" defaultValue={initialData?.shortDescription} />
+                        <Input name="shortDescription" defaultValue={initialData?.shortDescription} placeholder="Brief summary of the product" />
                     </div>
                     <div className="col-span-2">
                         <label className="text-sm font-medium">Full Description</label>
-                        <textarea name="fullDescription" defaultValue={initialData?.fullDescription} className="w-full p-2 rounded-md border bg-background min-h-[100px]" />
+                        <textarea name="fullDescription" defaultValue={initialData?.fullDescription} className="w-full p-2 rounded-md border bg-background min-h-[100px]" placeholder="Detailed product information, materials, sizing, etc." />
                     </div>
                     <div className="flex items-center gap-4">
                         <label className="flex items-center gap-2">
@@ -101,23 +148,33 @@ export function ProductForm({
                         <div className="flex gap-4 flex-wrap">
                             {mediaList.map((m: any) => (
                                 <div key={m.id} className="relative group">
-                                    <img src={m.secureUrl} className="w-24 h-24 object-cover rounded-md border" />
+                                    <img src={m.secureUrl} alt={m.originalFilename || "Product image"} className="w-24 h-24 object-cover rounded-md border" />
                                     {m.isPrimary && <Badge className="absolute top-1 left-1">Primary</Badge>}
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 rounded-md">
                                         {!m.isPrimary && (
-                                            <form action={async () => {
-                                                await setPrimaryMediaAction(initialData.id, m.id);
-                                                setMediaList(mediaList.map(x => ({ ...x, isPrimary: x.id === m.id })));
-                                            }}>
-                                                <Button type="button" size="sm" variant="secondary">Set Primary</Button>
-                                            </form>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="secondary"
+                                                onClick={async () => {
+                                                    await setPrimaryMediaAction(initialData.id, m.id);
+                                                    setMediaList(mediaList.map(x => ({ ...x, isPrimary: x.id === m.id })));
+                                                }}
+                                            >
+                                                Set Primary
+                                            </Button>
                                         )}
-                                        <form action={async () => {
-                                            await detachMediaFromProductAction(initialData.id, m.id);
-                                            setMediaList(mediaList.filter(x => x.id !== m.id));
-                                        }}>
-                                            <Button type="button" size="sm" variant="destructive">Remove</Button>
-                                        </form>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={async () => {
+                                                await detachMediaFromProductAction(initialData.id, m.id);
+                                                setMediaList(mediaList.filter(x => x.id !== m.id));
+                                            }}
+                                        >
+                                            Remove
+                                        </Button>
                                     </div>
                                 </div>
                             ))}

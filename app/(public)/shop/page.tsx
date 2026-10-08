@@ -17,6 +17,8 @@ export default async function ShopPage() {
         db.select().from(productCategories),
     ]);
 
+    console.log("Fetched products:", products);
+
     return (
         <div className="py-12 md:py-20">
             <div className="container mx-auto px-4 md:px-6">
